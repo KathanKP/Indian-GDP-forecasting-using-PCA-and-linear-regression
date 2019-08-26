@@ -1,0 +1,52 @@
+---
+title: "3-2 SOP"
+author: "Kathan"
+date: "5 April 2017"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r pressure, echo=FALSE}
+data<-read.csv('Final Dataset.csv')
+GDP<-data.frame(data[,2])
+PCA_data<-data[,3:59]
+pca<-prcomp(PCA_data,scale=TRUE)
+summary(pca)
+coeffs<-pca$rotation
+coeffs<-coeffs[,c(1,2,3,4,5)]
+features<-as.matrix(PCA_data)%*%as.matrix(coeffs)
+features<-data.frame(features)
+final_data<-data.frame(GDP,features)
+colnames(final_data)<-c("GDP","PC1","PC2","PC3","PC4","PC5")
+linear_reg<-lm(GDP~PC1+PC2+PC3,data=final_data)
+summary(linear_reg)
+```
+```{r,echo=FALSE}
+data1<-read.csv('Small Dataset.csv')
+GDP<-data.frame(data1[,2])
+PCA_data<-data1[,3:31]
+pca<-prcomp(PCA_data,scale=TRUE)
+summary(pca)
+coeffs<-pca$rotation
+coeffs<-coeffs[,c(1,2,3,4,5)]
+features<-as.matrix(PCA_data)%*%as.matrix(coeffs)
+features<-data.frame(features)
+final_data<-data.frame(GDP,features)
+colnames(final_data)<-c("GDP","PC1","PC2","PC3","PC4","PC5")
+linear_reg<-lm(GDP~PC1+PC2+PC3+PC4,data=final_data[1:25,])
+summary(linear_reg)
+forecast1=predict(linear_reg,final_data[26,])
+forecast2=predict(linear_reg,final_data[27,])
+forecast3=predict(linear_reg,final_data[28,])
+a=rbind(forecast1,forecast2,forecast3)
+res=cbind(a,final_data[26:28,1])
+results=data.frame(res)
+colnames(results)<-c("Forecast","Actual")
+rownames(results)<-c("2010-11","2011-12","2012-13")
+results
+```
+
